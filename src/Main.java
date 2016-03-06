@@ -2,10 +2,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Random;
+import java.util.*;
 
 /**
  * Created by Atakan Arıkan on 28.02.2016.
@@ -16,6 +13,12 @@ public class Main {
     public static HashMap<String, HashMap<String, Integer>> testDocs = new HashMap<>();
     public static HashMap<String, Integer> authorsDocCount = new HashMap<>();
     public static HashSet<String> vocabulary = new HashSet<>();
+    public static HashMap<String, Double> totalWordLengthAuthors = new HashMap<>();
+    public static HashMap<String, Double> totalWordLengthTestDocs = new HashMap<>();
+    public static HashMap<String, Double> totalWordCountAuthors = new HashMap<>();
+    public static HashMap<String, Double> totalWordCountTestDocs = new HashMap<>();
+    public static final double NAIVE_BAYES_RATE = 0.6;
+    public static final double AVERAGE_WORD_LENGTH_RATE = 0.4;
     /*
     author1 : {
         word1: freq1,
@@ -23,30 +26,24 @@ public class Main {
          }
     */
     public static void main(String[] args) throws IOException {
-        System.out.println("hello");
         readInput(args[0], args[1]);
         naiveBayes();
-        /*
-        String key1 = "gulseBirsel";
-        System.out.println(key1 + ": {");
-        for(String key : authorsTraining.get(key1).keySet()){
-            System.out.println("   " + key + ": " + authorsTraining.get(key1).get(key) + ",");
-        }
-        System.out.println("}");
-        */
     }
 
-
+    /**
+     * calculates and prints the result of naive bayes method for all test documents
+     * @throws IOException
+     */
     public static void naiveBayes() throws IOException {
+        double totalWinners = 0;
         for (String filename: testDocs.keySet()) { // for each of the test documents
-            boolean x = true;
             HashMap<String, Integer> testDocWords = testDocs.get(filename); // get the {token: frequency} count of the test document
-            double minAuthorScore = 999999;
+            double minAuthorScore = -999999;
             String winnerAuthor = "";
             for (String author: authorsTraining.keySet()) { // for each of the authors(classes)
                 double authorResult = 0;
-                winnerAuthor = "";
-                minAuthorScore = -99999;
+                double averageWordLengthAuthor = totalWordLengthAuthors.get(author) / totalWordCountAuthors.get(author);
+                double averageWordLengthTestDoc = totalWordLengthTestDocs.get(filename) / totalWordCountTestDocs.get(filename);
                 double probAuthor = (double)authorsDocCount.get(author) / (double) totalDocNumber; // P(c)
                 HashMap<String, Integer> authorWords = authorsTraining.get(author); //get the {token: frequency} count of the combination of that author's docs
                 for (String testDocumentWord: testDocWords.keySet()) { // for each word in the test document
@@ -54,40 +51,54 @@ public class Main {
                     if(authorWords.containsKey(testDocumentWord)){
                         currentWordCount = authorWords.get(testDocumentWord); // get the author's word frequency
                     }
-                    double tempResult = (double) (currentWordCount + 1) / (double) (authorWords.keySet().size() + vocabulary.size());
-                  //  System.out.println(testDocumentWord + " : " +tempResult);
-                    authorResult+= Math.log(tempResult);
+                    // calculate P(w|c) with Laplace smoothing
+                    double tempResult = (double) testDocWords.get(testDocumentWord) * (double) (currentWordCount + 1) / (double) (authorWords.keySet().size() + vocabulary.size());
+                   authorResult += Math.log(tempResult); // multiply with P(C)
                 }
-                authorResult+= Math.log(probAuthor);
-
-                if(authorResult > minAuthorScore) {
+                authorResult+= NAIVE_BAYES_RATE *Math.log(probAuthor);
+                authorResult -= AVERAGE_WORD_LENGTH_RATE * 1000*Math.abs(averageWordLengthAuthor - averageWordLengthTestDoc);
+                if(authorResult >= minAuthorScore) {
                     minAuthorScore = authorResult;
                     winnerAuthor = author;
-                    System.out.println(filename + " + " + winnerAuthor+ " = " +minAuthorScore);
                 }
-
             }
-        }
+            String testAuthor = filename.substring(filename.indexOf("\\") + 1);
+            testAuthor = testAuthor.substring(testAuthor.indexOf("\\") + 1);
+            System.out.print(testAuthor + " is classified as from the author: " +winnerAuthor);
+            if(filename.contains(winnerAuthor))  {
+                System.out.print(" *************** ");
+                totalWinners++;
+            }
+            System.out.println();
 
+        }
+        double overallResult = 100*totalWinners/(double) testDocs.size();
+        System.out.println("Overall result: " + totalWinners + "/" + testDocs.size() + " = % " + String.format( "%.2f", overallResult ));
     }
 
     @SuppressWarnings("Duplicates")
     public static void readInput(String trainingInput, String testInput) throws IOException {
         totalDocNumber = 0;
         // read all the files in given folder
+        System.out.print("Reading the training files... ");
         Files.walk(Paths.get(trainingInput)).forEach(filePath -> {
             if (Files.isRegularFile(filePath) && filePath.toString().endsWith("txt")) {
                 //noinspection TryWithIdenticalCatches
                 try {
                     totalDocNumber++;
                     String str = "";
-                    //System.out.println(filePath);
                     String authorName = filePath.toString().substring(filePath.toString().indexOf("\\") + 10, filePath.toString().lastIndexOf("\\"));
                     if(!authorsTraining.containsKey(authorName)) {
                         authorsTraining.put(authorName, new HashMap<>());
                     }
                     if(!authorsDocCount.containsKey(authorName)) {
                         authorsDocCount.put(authorName, 0);
+                    }
+                    if(!totalWordLengthAuthors.containsKey(authorName)) {
+                        totalWordLengthAuthors.put(authorName, 0.0);
+                    }
+                    if(!totalWordCountAuthors.containsKey(authorName)) {
+                        totalWordCountAuthors.put(authorName, 0.0);
                     }
                     authorsDocCount.put(authorName, authorsDocCount.get(authorName) + 1);
                     HashMap<String, Integer> authorsWords = authorsTraining.get(authorName);
@@ -99,6 +110,7 @@ public class Main {
                         str = tokenize(str);
                         String[] line = str.trim().split(" ");
                         for (String token: line) { // for each word in that specific line in the file
+                            totalWordLengthAuthors.put(authorName, totalWordLengthAuthors.get(authorName) + token.length());
                             vocabulary.add(token);
                             if(token.length() > 0) {
                                 if (authorsWords.containsKey(token)) {
@@ -108,6 +120,7 @@ public class Main {
                                 }
                             }
                         }
+                        totalWordCountAuthors.put(authorName, totalWordCountAuthors.get(authorName) + line.length);
                     }
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
@@ -116,7 +129,8 @@ public class Main {
                 }
             }
         });
-
+        System.out.println("Done!");
+        System.out.print("Reading the test files... ");
         Files.walk(Paths.get(testInput)).forEach(filePath -> {
             if (Files.isRegularFile(filePath) && filePath.toString().endsWith("txt")) {
                 //noinspection TryWithIdenticalCatches
@@ -125,7 +139,12 @@ public class Main {
                     if(!testDocs.containsKey(filePath.toString())) {
                         testDocs.put(filePath.toString(), new HashMap<>());
                     }
-
+                    if(!totalWordLengthTestDocs.containsKey(filePath.toString())) {
+                        totalWordLengthTestDocs.put(filePath.toString(), 0.0);
+                    }
+                    if(!totalWordCountTestDocs.containsKey(filePath.toString())) {
+                        totalWordCountTestDocs.put(filePath.toString(), 0.0);
+                    }
                     HashMap<String, Integer> testDocWords = testDocs.get(filePath.toString());
                     InputStream bytes = new FileInputStream(filePath.toString());
                     Reader chars = new InputStreamReader(bytes, StandardCharsets.ISO_8859_1);
@@ -135,6 +154,7 @@ public class Main {
                         str = tokenize(str);
                         String[] line = str.trim().split(" ");
                         for (String token: line) { // for each word in that specific line in the file
+                            totalWordLengthTestDocs.put(filePath.toString(), totalWordLengthTestDocs.get(filePath.toString()) + token.length()); // add the token length
                             if(token.length() > 0) {
                                 if (testDocWords.containsKey(token)) {
                                     testDocWords.put(token, testDocWords.get(token) + 1);
@@ -143,6 +163,7 @@ public class Main {
                                 }
                             }
                         }
+                        totalWordCountTestDocs.put(filePath.toString(), totalWordCountTestDocs.get(filePath.toString()) + line.length);
                     }
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
@@ -151,6 +172,7 @@ public class Main {
                 }
             }
         });
+        System.out.println("Done!");
     }
 
     /*
