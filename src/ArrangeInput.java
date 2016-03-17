@@ -117,19 +117,19 @@ public class ArrangeInput {
                 // now we know whether it is a test or training document, we can read and write into output folder.
                 try {
                     String authorFileName = filePath.toString().substring(filePath.toString().indexOf("\\")+1);
-                    System.out.print("Copying " + filePath.toString() + " to: ");
+              //      System.out.print("Copying " + filePath.toString() + " to: ");
                     if (isTraining) { // write to training folder
                         String targetPath = outPutDirectory + "\\training\\" + authorFileName; // determine the output location
-                        System.out.print(targetPath + " ...");
+                //        System.out.print(targetPath + " ...");
                         File targetFile = new File(targetPath);
                         Files.copy(filePath, targetFile.toPath(), StandardCopyOption.REPLACE_EXISTING); // copy the file
                     } else { // write to test folder
                         String targetPath = outPutDirectory + "\\test\\" + authorFileName; // determine the output location
-                        System.out.print(targetPath + " ...");
+         //               System.out.print(targetPath + " ...");
                         File targetFile = new File(targetPath);
                         Files.copy(filePath, targetFile.toPath(), StandardCopyOption.REPLACE_EXISTING); // copy the file
                     }
-                    System.out.println(" Done!");
+          //          System.out.println(" Done!");
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

@@ -17,8 +17,8 @@ public class Main {
     public static HashMap<String, Double> totalWordLengthTestDocs = new HashMap<>();
     public static HashMap<String, Double> totalWordCountAuthors = new HashMap<>();
     public static HashMap<String, Double> totalWordCountTestDocs = new HashMap<>();
-    public static final double NAIVE_BAYES_RATE = 0.6;
-    public static final double AVERAGE_WORD_LENGTH_RATE = 0.4;
+    public static final double NAIVE_BAYES_RATE = 1;
+    public static final double AVERAGE_WORD_LENGTH_RATE = 0;
     /*
     author1 : {
         word1: freq1,
@@ -29,6 +29,7 @@ public class Main {
         readInput(args[0], args[1]);
         naiveBayes();
     }
+
 
     /**
      * calculates and prints the result of naive bayes method for all test documents
@@ -52,10 +53,10 @@ public class Main {
                         currentWordCount = authorWords.get(testDocumentWord); // get the author's word frequency
                     }
                     // calculate P(w|c) with Laplace smoothing
-                    double tempResult = (double) testDocWords.get(testDocumentWord) * (double) (currentWordCount + 1) / (double) (authorWords.keySet().size() + vocabulary.size());
+                    double tempResult = (double) testDocWords.get(testDocumentWord) * (double) (currentWordCount + 0.1) / (double) (authorWords.keySet().size() + 0.1*vocabulary.size());
                    authorResult += Math.log(tempResult); // multiply with P(C)
                 }
-                authorResult+= NAIVE_BAYES_RATE *Math.log(probAuthor);
+                authorResult += NAIVE_BAYES_RATE *Math.log(probAuthor);
                 authorResult -= AVERAGE_WORD_LENGTH_RATE * 1000*Math.abs(averageWordLengthAuthor - averageWordLengthTestDoc);
                 if(authorResult >= minAuthorScore) {
                     minAuthorScore = authorResult;
@@ -64,12 +65,12 @@ public class Main {
             }
             String testAuthor = filename.substring(filename.indexOf("\\") + 1);
             testAuthor = testAuthor.substring(testAuthor.indexOf("\\") + 1);
-            System.out.print(testAuthor + " is classified as from the author: " +winnerAuthor);
+      //      System.out.print(testAuthor + " is classified as from the author: " +winnerAuthor);
             if(filename.contains(winnerAuthor))  {
-                System.out.print(" *************** ");
+        //        System.out.print(" *************** ");
                 totalWinners++;
             }
-            System.out.println();
+         //   System.out.println();
 
         }
         double overallResult = 100*totalWinners/(double) testDocs.size();
@@ -175,7 +176,7 @@ public class Main {
         System.out.println("Done!");
     }
 
-    /*
+    /**
         takes the input, makes all lowercased.
         gets rid of the words containing all nonword characters.
         gets rid of the nonword characters at the beginning of a word.
@@ -205,9 +206,6 @@ public class Main {
                     bigBuilder.append(" ");
 
                 } catch (Exception e1) {
-                    if (active.contains("&lt;")) { // handle words including this
-                        active = active.substring(0, active.indexOf("&lt;")) + active.substring(active.indexOf("&lt;") + 3);
-                    }
                     for (int j = 0; j < active.length(); j++) {
                         if (Character.isDigit(active.charAt(j)) || Character.isLetter(active.charAt(j))) {
                             stringBuilder.append(active.charAt(j));
