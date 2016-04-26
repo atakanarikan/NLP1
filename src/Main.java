@@ -53,7 +53,7 @@ public class Main {
                         currentWordCount = authorWords.get(testDocumentWord); // get the author's word frequency
                     }
                     // calculate P(w|c) with Laplace smoothing
-                    double tempResult = (double) testDocWords.get(testDocumentWord) * (double) (currentWordCount + 0.1) / (double) (authorWords.keySet().size() + 0.1*vocabulary.size());
+                    double tempResult = (double) testDocWords.get(testDocumentWord) * (double) (currentWordCount + 0.001) / (double) (authorWords.keySet().size() + 0.001*vocabulary.size());
                    authorResult += Math.log(tempResult); // multiply with P(C)
                 }
                 authorResult += NAIVE_BAYES_RATE *Math.log(probAuthor);
