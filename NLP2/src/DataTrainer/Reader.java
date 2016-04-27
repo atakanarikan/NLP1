@@ -1,16 +1,27 @@
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+package DataTrainer;
+
+import java.io.*;
 import java.util.HashMap;
 
 /**
  * Created by Atakan Arıkan on 26.04.2016.
  */
 public class Reader {
+    /**
+     * Reads the file.
+     *
+     * Calculates the number of occurrences of a word for each PosTag.
+     * Calculates the number of occurrences of a PosTag before the current PosTag
+     * Calculates the number of occurrences of a PosTag after the current PosTag
+     * @param filepath filePath given as the first argument.
+     * @param posList training data to be filled.
+     * @throws IOException
+     */
     public static void ReadFile(String filepath, HashMap<String, PosTag> posList) throws IOException {
+        FilePermission permission = new FilePermission(filepath, "read");
         BufferedReader read;
-        read = new BufferedReader(new FileReader(new File(filepath)));
+        File infile = new File(filepath);
+        read = new BufferedReader(new FileReader(infile));
         String str;
         String previousPOS = "start";
         while ((str = read.readLine()) != null) {
@@ -48,6 +59,12 @@ public class Reader {
         }
     }
 
+    /**
+     * Calculates all the probabilities.
+     *
+     * Instead of number of occurrence, calculates and sets the probabilities for each PosTag.
+     * @param allPosTags filled training data after reading the file.
+     */
     public static void normalize(HashMap<String, PosTag> allPosTags) {
         for (String posName : allPosTags.keySet()) {
             allPosTags.get(posName).normalize();

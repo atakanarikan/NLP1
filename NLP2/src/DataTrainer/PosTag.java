@@ -1,9 +1,11 @@
+package DataTrainer;
+
 import java.util.HashMap;
 
 /**
  * Created by Atakan Arıkan on 26.04.2016.
  */
-public class PosTag {
+public class PosTag implements java.io.Serializable{
     String name;
     HashMap<String, Double> wordProbabilites = new HashMap<>();
     HashMap<String, Double> previousPosProbs = new HashMap<>();
@@ -55,6 +57,14 @@ public class PosTag {
         this.nextPosProbs = nextPosProbs;
     }
 
+    /**
+     * adds the (posName, value) pair to the given hashmap.
+     * if the hashmap already contains the key, increments its original value,
+     * else creates a new entry in the hashmap as (posName, value)
+     * @param hashmap
+     * @param posName
+     * @param value
+     */
     public void addElement(HashMap<String, Double> hashmap, String posName, double value) {
         if (hashmap.containsKey(posName)) {
             double newValue = hashmap.get(posName) + 1;
@@ -63,6 +73,13 @@ public class PosTag {
             hashmap.put(posName, value);
         }
     }
+
+    /**
+     * normalizes the values of;
+     * wordProbabilites
+     * previousPosProbs
+     * nextPosProbs
+     */
     public void normalize(){
         for (String word : wordProbabilites.keySet()) {
             double newVal = wordProbabilites.get(word) / (double) totalOccurence;
