@@ -11,7 +11,7 @@ import java.util.HashMap;
 public class DataTrainer {
     public static HashMap<String, PosTag> allPosTags = new HashMap<>();
     public static void main(String[] args) throws IOException {
-        initialize(args[0]);
+        initialize(args[0], args[2]);
         serialize(args[1]);
     }
     /**
@@ -33,10 +33,10 @@ public class DataTrainer {
      * @param filepath: first argument of the program. path of the file.
      * @throws IOException
      */
-    static void initialize(String filepath) throws IOException {
+    static void initialize(String filepath, String posType) throws IOException {
         allPosTags.put("start", new PosTag("start"));
         allPosTags.put("end", new PosTag("end"));
-        Reader.ReadFile(filepath, allPosTags);
+        Reader.ReadFile(filepath, allPosTags, posType);
         Reader.normalize(allPosTags);
     }
 }

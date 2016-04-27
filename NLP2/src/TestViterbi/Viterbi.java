@@ -9,7 +9,7 @@ import java.util.HashMap;
 /**
  * Created by Atakan Arıkan on 27.04.2016.
  */
-public class Tester {
+public class Viterbi {
     public static HashMap<String, PosTag> allPosTags = new HashMap<>();
     public static ArrayList<ArrayList<String>> sentences = new ArrayList<>();
     public static ArrayList<String> pos = new ArrayList<>();
@@ -22,14 +22,29 @@ public class Tester {
         System.out.println();
     }
 
+    /**
+     * Writes the output of the program in to the given file in the format of <w1 pos1>
+     * @param filename input filename
+     * @throws FileNotFoundException
+     * @throws UnsupportedEncodingException
+     */
     private static void write(String filename) throws FileNotFoundException, UnsupportedEncodingException {
         PrintWriter writer = new PrintWriter(filename, "UTF-8");
         for (String line : result) {
-            writer.println(line);
+            if (line.equals("\n")) {
+                writer.println("");
+            }
+            else {
+                writer.println(line);
+            }
         }
         writer.close();
     }
 
+    /**
+     * Calculates the best possible series of PosTags for each of the sentences
+     * @param sentences list of sentences in the test file
+     */
     private static void viterbi(ArrayList<ArrayList<String>> sentences) {
 
         for (ArrayList<String> sentence : sentences) {
@@ -40,9 +55,16 @@ public class Tester {
                 result.add(token + " " + currentState);
                 previousState = currentState;
             }
+            result.add("\n");
         }
     }
 
+    /**
+     * Considering the current word and the previous PosTag, calculates the current PosTag
+     * @param token current Word
+     * @param previousState previous PosTag
+     * @return name of the winner PosTag
+     */
     private static String findAndRetrieveMostProbable(String token, String previousState) {
         String winner = "";
         double max = 0;
@@ -64,6 +86,11 @@ public class Tester {
         return winner;
     }
 
+    /**
+     * Reads the test file.
+     * @param filepath Path to the test file given as argument
+     * @throws IOException
+     */
     private static void readFile(String filepath) throws IOException {
         BufferedReader read;
         File infile = new File(filepath);
@@ -90,6 +117,12 @@ public class Tester {
         }
     }
 
+    /**
+     * Deserializes the output of DataTrainer
+     * @param filename Path to the output of DataTrainer's .ser file
+     * @throws IOException
+     * @throws ClassNotFoundException
+     */
     private static void deserialize(String filename) throws IOException, ClassNotFoundException {
         FileInputStream fileIn = new FileInputStream(filename);
         ObjectInputStream in = new ObjectInputStream(fileIn);

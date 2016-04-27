@@ -15,15 +15,19 @@ public class Reader {
      * Calculates the number of occurrences of a PosTag after the current PosTag
      * @param filepath filePath given as the first argument.
      * @param posList training data to be filled.
+     * @param posType type of the postag, cpostag or postag
      * @throws IOException
      */
-    public static void ReadFile(String filepath, HashMap<String, PosTag> posList) throws IOException {
-        FilePermission permission = new FilePermission(filepath, "read");
+    public static void ReadFile(String filepath, HashMap<String, PosTag> posList, String posType) throws IOException {
         BufferedReader read;
         File infile = new File(filepath);
         read = new BufferedReader(new FileReader(infile));
         String str;
         String previousPOS = "start";
+        int index = 3;
+        if(posType.toLowerCase().equals("--postag")) {
+            index = 4;
+        }
         while ((str = read.readLine()) != null) {
             if (str.equals("")){ //beginning of a new sentence
                 PosTag currentPOSObject = posList.get(previousPOS);
@@ -40,11 +44,11 @@ public class Reader {
                     if(elements[1].equals("_")){
                         word = elements[2].toLowerCase();
                     }
-                    String currentPOS = elements[4];
+                    String currentPOS = elements[index];
                     if (posList.containsKey(currentPOS)) {
                         currentPOSObject = posList.get(currentPOS);
                     } else {
-                        currentPOSObject = new PosTag(elements[4]);
+                        currentPOSObject = new PosTag(elements[index]);
                     }
                     currentPOSObject.addElement(currentPOSObject.getPreviousPosProbs(), previousPOS, 1.0);
                     currentPOSObject.addElement(currentPOSObject.getWordProbabilites(), word, 1.0);
