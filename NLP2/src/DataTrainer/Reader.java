@@ -2,11 +2,14 @@ package DataTrainer;
 
 import java.io.*;
 import java.util.HashMap;
+import java.util.HashSet;
 
 /**
  * Created by Atakan Arıkan on 26.04.2016.
  */
 public class Reader {
+    public static HashSet<String> postags = new HashSet<>();
+    public static HashSet<String> cpostags = new HashSet<>();
     /**
      * Reads the file.
      *
@@ -50,6 +53,8 @@ public class Reader {
                     } else {
                         currentPOSObject = new PosTag(elements[index]);
                     }
+                    cpostags.add(elements[3]);
+                    postags.add(elements[4]);
                     currentPOSObject.addElement(currentPOSObject.getPreviousPosProbs(), previousPOS, 1.0);
                     currentPOSObject.addElement(currentPOSObject.getWordProbabilites(), word, 1.0);
                     currentPOSObject.setTotalOccurence(currentPOSObject.getTotalOccurence() + 1);
