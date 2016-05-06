@@ -26,7 +26,7 @@ This is an implementation of the Viterbi Algorithm on MetuBank dataset using Jav
 
 ## How to run the code ##
 Assuming all files are compiled using: 
-    `javac <filename>.java`
+    `javac <filename>`
 
 1. Runner.java
 --------------
