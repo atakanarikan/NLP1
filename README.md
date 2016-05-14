@@ -11,8 +11,11 @@ compile each of the java classes by javac ArrangeInput.java and javac Main.java 
 Go to Executables/NLP1/
 type the following command in the commandline: 
 
-    java -jar Runner.jar "raw_texts" "output_folder_path" "output_folder_path/training" "output_folder_path/test"
-the algorithm will scan the input folder and will create the folder and the files under output_folder_path. Then will divide the context into: output_folder_path/test and output_folder_path/training. 60% of the test documents for an author will be in the output_folder_path/training/authorname and its the same for test, only the ratio is 40%folder.
+    java -jar Runner.jar "raw_texts" "output_folder_path"
+    
+The program expects output_folder_path to be empty. If there are already files in the folder, the result of the program might not be correct.
+
+The algorithm will scan the input folder and will create the folder and the files under output_folder_path. Then will divide the context into: output_folder_path/test and output_folder_path/training. 60% of the test documents for an author will be in the output_folder_path/training/authorname and its the same for test, only the ratio is 40%folder.
 
 # NLP2
 Second project of the semester for the class CMPE561: Natural Language Processing
