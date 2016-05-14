@@ -5,11 +5,9 @@ import java.io.IOException;
  */
 public class Runner {
     public static void main(String[] args) throws IOException {
-        ArrangeInput arrangeInput = new ArrangeInput();
-        Main main = new Main();
-        String[] args1 = {"raw_texts", "outputfolder"};
-        String[] args2 = {"outputfolder/training", "outputfolder/test"};
-        arrangeInput.main(args1);
-        main.main(args2);
+        String[] args1 = {args[0], args[1]};
+        String[] args2 = {args[1] +"/training", args[1] +"/test"};
+        ArrangeInput.main(args1);
+        Main.main(args2);
     }
 }

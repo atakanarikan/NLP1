@@ -68,9 +68,9 @@ public class ArrangeInput {
                     trainingCount = (int) (fileCount - testCount);
                     currentTestCount = 0;
                     currentTrainingCount = 0;
-                    authorName = filePath.toString().substring(filePath.toString().indexOf("\\")+1);
-                    File authorTestDir = new File(outPutDirectory + "\\test\\" + authorName);
-                    File authorTrainingDir = new File(outPutDirectory + "\\training\\" + authorName);
+                    authorName = filePath.toString().substring(filePath.toString().indexOf("/")+1);
+                    File authorTestDir = new File(outPutDirectory + "/test/" + authorName);
+                    File authorTrainingDir = new File(outPutDirectory + "/training/" + authorName);
                     if(!authorTestDir.exists()){ // create the test folder if it doesnt exist in the output path
                         try {
                             //noinspection ResultOfMethodCallIgnored

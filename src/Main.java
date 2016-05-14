@@ -88,7 +88,7 @@ public class Main {
                 try {
                     totalDocNumber++;
                     String str = "";
-                    String authorName = filePath.toString().substring(filePath.toString().indexOf("\\") + 10, filePath.toString().lastIndexOf("\\"));
+                    String authorName = filePath.toString().substring(filePath.toString().indexOf("/") + 10, filePath.toString().lastIndexOf("/"));
                     if(!authorsTraining.containsKey(authorName)) {
                         authorsTraining.put(authorName, new HashMap<>());
                     }
